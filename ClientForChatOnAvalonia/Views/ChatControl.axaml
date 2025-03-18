@@ -1,0 +1,234 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:vm="clr-namespace:ClientForChatOnAvalonia.ViewModels;assembly=ClientForChatOnAvalonia"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:ClientForChatOnAvalonia.Converters"
+             xmlns:viewModels="clr-namespace:ClientForChatOnAvalonia.ViewModels"
+             x:DataType="viewModels:ChatViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ClientForChatOnAvalonia.ChatControl"
+             x:Name="SelfControl">
+
+  <UserControl.Resources>
+    <converters:BoolToVisibilityForCurrentUserConverter x:Key="BoolToVisibilityForCurrentUserConverter"/>
+    <converters:BoolToVisibilityForOtherUserConverter x:Key="BoolToVisibilityForOtherUserConverter"/>
+    <converters:ListBoxWidthConverter x:Key="ListBoxWidthConverter"/>
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="ListBox.messegeListBox > ListBoxItem">
+      <Setter Property="Template">
+        <ControlTemplate TargetType="ListBoxItem">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Margin="0,5,0,5" />
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="ListBox.emojisListBox > ListBoxItem">
+      <Setter Property="Template">
+        <ControlTemplate TargetType="ListBoxItem">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Margin="0,0,0,0" />
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="TextBox.CustomTextBox">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CaretBrush" Value="Transparent"/>
+      <Setter Property="Focusable" Value="False"/>
+    </Style>
+    <Style Selector="TextBox.CustomTextBox:pointerover">
+      <Setter Property="Foreground" Value="Transparent" />
+    </Style>
+    <Style Selector="TextBox.CustomTextBox:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="TextBox.CustomTextBox:pointerover /template/ TextBlock#PART_Watermark, TextBox:pointerover /template/ TextBlock#PART_FloatingWatermark">
+      <Setter Property="Foreground" Value="Transparent" />
+    </Style>
+  </UserControl.Styles>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <ListBox ItemsSource="{Binding Messages}"
+             BorderThickness="0"
+             Background="Transparent"
+             Name="MessagesList"
+             ScrollViewer.ScrollChanged="MessagesList_ScrollChanged"
+             Classes="messegeListBox">
+
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Grid Width="{Binding #MessagesList.Bounds.Width, Converter={StaticResource ListBoxWidthConverter}}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left-aligned (other users) -->
+            <WrapPanel Grid.Column="0" HorizontalAlignment="Left" Focusable="False">
+              <Border Background="#af4c58" Padding="5" CornerRadius="10"
+                      IsVisible="{Binding IsFromCurrentUser, Converter={StaticResource BoolToVisibilityForOtherUserConverter}}">
+                <WrapPanel>
+                  <SelectableTextBlock  Text="{Binding Username}"
+                          Foreground="Black"
+                          TextWrapping="Wrap"
+                          Classes="CustomTextBox">
+                  </SelectableTextBlock>
+                </WrapPanel>
+              </Border>
+            </WrapPanel>
+
+            <WrapPanel Grid.Column="1" HorizontalAlignment="Left" Focusable="False" MaxWidth="350">
+              <Border Background="#ddd" Padding="5" CornerRadius="10"
+                      IsVisible="{Binding IsFromCurrentUser, Converter={StaticResource BoolToVisibilityForOtherUserConverter}}">
+                <Grid>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                  </Grid.RowDefinitions>
+                  <SelectableTextBlock  Text="{Binding Content}"
+                          Foreground="Black"
+                          TextWrapping="Wrap"
+                          Classes="CustomTextBox"
+                          Padding="10,5,10,5"
+                          Grid.Row="0">
+                  </SelectableTextBlock>
+                  <TextBlock Text="{Binding CreatedAt}"
+                          Foreground="Black"
+                          Classes="CustomTextBox CustomTimeBox"
+                          FontSize="10"
+                          Padding="10,0,0,0"
+                          Margin="0"
+                          Grid.Row="1"
+                          TextAlignment="Left"
+                          VerticalAlignment="Top">
+                  </TextBlock>
+                </Grid>
+              </Border>
+            </WrapPanel>
+
+            <!-- Right-aligned (current user) -->
+            <WrapPanel Grid.Column="2" HorizontalAlignment="Right" MaxWidth="350">
+              <Border Background="#ddd" Padding="5" CornerRadius="10"
+                      IsVisible="{Binding IsFromCurrentUser, Converter={StaticResource BoolToVisibilityForCurrentUserConverter}}">
+                <Grid>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                  </Grid.RowDefinitions>
+                  <SelectableTextBlock  Text="{Binding Content}"
+                          Foreground="Black"
+                          TextWrapping="Wrap"
+                          TextAlignment="Right"
+                          Classes="CustomTextBox"
+                          Padding="10,5,10,5">
+                    <InlineUIContainer>
+                      <HyperlinkButton></HyperlinkButton>
+                    </InlineUIContainer>
+                  </SelectableTextBlock>
+                  <TextBlock Text="{Binding CreatedAt}"
+                           Foreground="Black"
+                           Classes="CustomTextBox CustomTimeBox"
+                           FontSize="10"
+                           Padding="10,0,0,0"
+                           Margin="0"
+                           Grid.Row="1"
+                           TextAlignment="Right"
+                           VerticalAlignment="Top">
+                  </TextBlock>
+                </Grid>
+              </Border>
+            </WrapPanel>
+
+            <WrapPanel Grid.Column="3" HorizontalAlignment="Right">
+              <Border Background="#4CAF50" Padding="5" CornerRadius="10"
+                      IsVisible="{Binding IsFromCurrentUser, Converter={StaticResource BoolToVisibilityForCurrentUserConverter}}">
+                <SelectableTextBlock  Text="{Binding Username}"
+                          Foreground="Black"
+                          TextWrapping="Wrap"
+                          TextAlignment="Right"
+                          Classes="CustomTextBox">
+                </SelectableTextBlock>
+              </Border>
+            </WrapPanel>
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <TextBox Text="{Binding NewMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               KeyDown="TextBox_KeyDown"
+               Height="50"
+               TextWrapping="Wrap"
+               Grid.Column="0"/>
+
+      <Button Command="{Binding SendMessageCommand}"
+              Grid.Column="1"
+              Width="100"
+              Height="50">
+        <StackPanel Orientation="Horizontal"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center">
+          <TextBlock Text="Send" FontSize="20" Margin="0"/>
+        </StackPanel>
+      </Button>
+
+      <Button Width="40" Height="50"
+              Grid.Column="2"
+              Command="{Binding OpenEmojiPickerCommand}">
+        <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+          <TextBlock Text="😊" FontSize="20" Margin="0"/>
+        </StackPanel>
+      </Button>
+
+      <Popup IsOpen="{Binding IsEmojiPickerOpen}" PlacementMode="RightEdgeAlignedBottom">
+        <ListBox ItemsSource="{Binding EmojiList}" SelectionMode="Single"
+                 MaxHeight="300" MaxWidth="500"
+                 Classes="emojisListBox">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Button Content="{Binding Emoji}"
+                      Command="{Binding $parent[UserControl].((vm:ChatViewModel)DataContext).OnEmojiClick}"
+                      CommandParameter="{Binding Emoji}"
+                      Width="50" Height="50" FontSize="25"/>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Popup>
+    </Grid>
+  </Grid>
+</UserControl>

@@ -4,22 +4,21 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using ClientForChatOnAvalonia.Models;
-using ClientForChatOnAvalonia.Services;
 using Microsoft.Data.Sqlite;
 using Tmds.DBus.Protocol;
 
-namespace ClientForChatOnAvalonia.Data
+namespace ClientForChatOnAvalonia.Services
 {
-    public class MessagesDatabaseService
+    public class MessagesRepository
     {
         private readonly string _connectionString = "Data Source=app.db";
 
         private readonly ApiService _apiService;
-        private readonly UsersDatabaseService _usersDatabaseService;
+        private readonly UsersRepository _usersDatabaseService;
 
-        public MessagesDatabaseService(ApiService apiService, UsersDatabaseService usersDatabaseService)
+        public MessagesRepository(ApiService apiService, UsersRepository usersDatabaseService)
         {
-             InitializeDatabase();
+            InitializeDatabase();
             _apiService = apiService;
             _usersDatabaseService = usersDatabaseService;
         }
@@ -32,7 +31,7 @@ namespace ClientForChatOnAvalonia.Data
                 {
                     connection.Open();
                     var createTableQuery = @"
-                CREATE TABLE IF NOT EXISTS Messages (
+                    CREATE TABLE IF NOT EXISTS Messages (
                     Id INTEGER PRIMARY KEY,
                     Content TEXT NOT NULL,
                     UserID INTEGER NOT NULL,
@@ -46,11 +45,11 @@ namespace ClientForChatOnAvalonia.Data
                 {
                     Debug.WriteLine(ex);
                 }
-                
+
             }
         }
 
-        public async Task SaveMessage(MessageModel message)
+        public async Task SaveMessage(MessageDto message)
         {
             await _usersDatabaseService.GetOrFetchUser(message.UserID);
             using (var connection = new SqliteConnection(_connectionString))
@@ -79,7 +78,7 @@ namespace ClientForChatOnAvalonia.Data
             }
         }
 
-        public async Task<List<MessageModel>> GetMessagesAsync(int offset, int limit)
+        public async Task<List<MessageDto>> GetMessagesAsync(int offset, int limit)
         {
 
             var messagesToFetch = await _apiService.FetchMessagesAsync(offset, limit);
@@ -87,38 +86,38 @@ namespace ClientForChatOnAvalonia.Data
             {
                 await SaveMessages(messagesToFetch);
             }
-            var messages = new List<MessageModel>();
+            var messages = new List<MessageDto>();
 
             using (var connection = new SqliteConnection(_connectionString))
             {
                 try
                 {
                     connection.Open();
-                string selectMessages = @"
+                    string selectMessages = @"
                 SELECT Id, Content, UserID, CreatedAt 
                 FROM Messages 
                 ORDER BY CreatedAt DESC
                 LIMIT @Limit OFFSET @Offset";
 
-                using (var command = new SqliteCommand(selectMessages, connection))
-                {
-                    command.Parameters.AddWithValue("@Limit", limit);
-                    command.Parameters.AddWithValue("@Offset", offset);
-
-                    using (var reader = command.ExecuteReader())
+                    using (var command = new SqliteCommand(selectMessages, connection))
                     {
-                        while (reader.Read())
+                        command.Parameters.AddWithValue("@Limit", limit);
+                        command.Parameters.AddWithValue("@Offset", offset);
+
+                        using (var reader = command.ExecuteReader())
                         {
-                            messages.Add(new MessageModel
+                            while (reader.Read())
                             {
-                                Id = reader.GetInt32(0),
-                                Content = reader.GetString(1),
-                                UserID = reader.GetInt32(2),
-                                CreatedAt = DateTime.Parse(reader.GetString(3))
-                            });
+                                messages.Add(new MessageDto
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Content = reader.GetString(1),
+                                    UserID = reader.GetInt32(2),
+                                    CreatedAt = DateTime.Parse(reader.GetString(3))
+                                });
+                            }
                         }
                     }
-                }
                 }
                 catch (Exception ex)
                 {
@@ -129,7 +128,7 @@ namespace ClientForChatOnAvalonia.Data
             return messages;
         }
 
-        public async Task SaveMessages(List<MessageModel> messages)
+        public async Task SaveMessages(List<MessageDto> messages)
         {
             foreach (var message in messages)
                 await _usersDatabaseService.GetOrFetchUser(message.UserID);

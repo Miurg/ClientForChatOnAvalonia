@@ -11,7 +11,6 @@ using System.Net.Security;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Text.Json;
-using ClientForChatOnAvalonia.Data;
 using System.Net.Http.Headers;
 
 namespace ClientForChatOnAvalonia.Services
@@ -96,7 +95,7 @@ namespace ClientForChatOnAvalonia.Services
             }
         }
 
-        public async Task<List<MessageModel>> FetchMessagesAsync(int offset, int limit)
+        public async Task<List<MessageDto>> FetchMessagesAsync(int offset, int limit)
         {
             try
             {
@@ -106,7 +105,7 @@ namespace ClientForChatOnAvalonia.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var jsonResponse = await response.Content.ReadAsStringAsync();
-                    var messages = JsonConvert.DeserializeObject<List<MessageModel>>(jsonResponse);
+                    var messages = JsonConvert.DeserializeObject<List<MessageDto>>(jsonResponse);
 
                     // Сохраняем полученные сообщения в локальной БД
                     return messages;

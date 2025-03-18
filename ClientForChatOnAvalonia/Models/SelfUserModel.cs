@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ClientForChatOnAvalonia.Models
 {
-    internal class LoginRequestModel
+    public class SelfUserModel
     {
-        public required string Username { get; set; }
-        public required string Password { get; set; }
+        public required string UserName { get; set; }
     }
 }

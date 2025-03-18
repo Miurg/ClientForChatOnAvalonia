@@ -3,10 +3,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.IO;
 using Avalonia.Platform.Storage;
+using ClientForChatOnAvalonia.Interfaces.Services;
 
 namespace ClientForChatOnAvalonia.Services
 {
-    public class TokenService
+    public class TokenService: ITokenService
     {
         private const string TokenFileName = "token.dat";
 

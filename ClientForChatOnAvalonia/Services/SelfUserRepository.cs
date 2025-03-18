@@ -2,13 +2,13 @@
 using System;
 using System.IO;
 
-namespace ClientForChatOnAvalonia.Data
+namespace ClientForChatOnAvalonia.Services
 {
-    public class SelfUserDatabaseService
+    public class SelfUserRepository
     {
         private readonly string _connectionString = "Data Source=app.db";
 
-        public SelfUserDatabaseService()
+        public SelfUserRepository()
         {
             InitializeDatabase();
         }
@@ -39,7 +39,7 @@ namespace ClientForChatOnAvalonia.Data
                 command.Parameters.AddWithValue("@Username", username);
                 command.ExecuteNonQuery();
             }
-            
+
         }
 
         public string GetLastSelfUser()

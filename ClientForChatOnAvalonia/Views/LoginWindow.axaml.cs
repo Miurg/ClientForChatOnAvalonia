@@ -1,15 +1,12 @@
 using Avalonia.Controls;
-using ClientForChatOnAvalonia.Data;
 using ClientForChatOnAvalonia.Services;
+using ClientForChatOnAvalonia.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ClientForChatOnAvalonia
 {
     public partial class LoginWindow : Window
     {
-        private readonly ApiService _apiService = new ApiService();
-        private readonly TokenService _tokenService = new TokenService();
-        private readonly SelfUserDatabaseService _selfService = new SelfUserDatabaseService();
-
         public LoginWindow()
         {
             InitializeComponent();
@@ -25,15 +22,13 @@ namespace ClientForChatOnAvalonia
                 ErrorLabel.IsVisible = true;
                 return;
             }
-
-            var token = await _apiService.LoginAsync(username, password);
+            var apiService = App.Services.GetRequiredService<ApiService>();
+            var token = await apiService.LoginAsync(username, password);
 
             if (token == true)
             {
-                _selfService.SaveSelfUser(username);
-                var messengerWindow = new MessengerWindow();
-                messengerWindow.InitEvent();
-                messengerWindow.Show();
+                var messangerWindow = new MessangerWindow(username);
+                messangerWindow.Show();
                 Close();
             }
             else

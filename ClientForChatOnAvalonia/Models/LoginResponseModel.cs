@@ -8,6 +8,6 @@ namespace ClientForChatOnAvalonia.Models
 {
     internal class LoginResponseModel
     {
-        public string Token { get; set; }
+        public required string Token { get; set; }
     }
 }

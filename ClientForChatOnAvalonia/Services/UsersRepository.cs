@@ -5,14 +5,14 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace ClientForChatOnAvalonia.Data
+namespace ClientForChatOnAvalonia.Services
 {
-    public class UsersDatabaseService
+    public class UsersRepository
     {
         private readonly string _connectionString = "Data Source=app.db";
         private readonly ApiService _apiService;
 
-        public UsersDatabaseService(ApiService apiService)
+        public UsersRepository(ApiService apiService)
         {
             // Создаем файл БД, если его нет (через FileStream)
             if (!File.Exists("app.db"))

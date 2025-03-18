@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:ClientForChatOnAvalonia.ViewModels"
+        x:DataType="viewModels:MessangerViewModel"
+        xmlns:controls="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Height="900" Width="800"
+        x:Class="ClientForChatOnAvalonia.MessangerWindow"
+        Title="MessangerWindow"
+        x:Name="MessageWindow"
+        MinWidth="500" MinHeight="700">
+  <Grid>
+    <ContentControl Content="{Binding CurrentView}" />
+  </Grid>
+</Window>

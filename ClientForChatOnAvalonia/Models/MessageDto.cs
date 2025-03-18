@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace ClientForChatOnAvalonia.Models
 {
-    public class MessageLocalModel
+    public class MessageDto
     {
         public int Id { get; set; }
-        public string Content { get; set; }
-        public string Username { get; set; }
+        public required string Content { get; set; }
+        public int UserID { get; set; }
         public DateTime CreatedAt { get; set; }
-        public bool IsFromCurrentUser { get; set; }
     }
 }
